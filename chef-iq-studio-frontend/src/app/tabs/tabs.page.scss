@@ -1,0 +1,56 @@
+ion-tab-bar.custom-tab-bar {
+  --background: #ffffff; /* light background */
+  height: 70px;
+  border-top: 1px solid #e0e0e0; /* subtle divider */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 4px;
+}
+
+ion-tab-button {
+  --background: transparent;
+  --color: #888888; /* inactive color */
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  padding: 6px 8px;
+}
+
+/* Hover effect for any tab button */
+ion-tab-button:hover {
+  --background: rgba(46, 204, 113, 0.07); /* Lighter green background on hover */
+  --color: #5cb85c; /* A slightly lighter green for text/icon on hover for inactive tabs */
+}
+
+ion-tab-button.tab-selected {
+  --background: rgba(46, 204, 113, 0.1); /* soft green background */
+  --color: #2ecc71; /* active green color for the button itself */
+  transform: scale(1.05);
+}
+
+/* Hover effect specifically for a selected tab button */
+/* This ensures the background changes on hover even when selected, but the active green color remains */
+ion-tab-button.tab-selected:hover {
+  --background: rgba(46, 204, 113, 0.07); /* Apply the lighter green background even when selected and hovered */
+  --color: #2ecc71; /* Keep the active green color for selected tab on hover */
+}
+
+
+/* Explicitly target the icon and label within the selected tab to ensure green */
+ion-tab-button.tab-selected ion-icon {
+  color: #2ecc71; /* active green color for the icon */
+}
+
+ion-tab-button.tab-selected ion-label {
+  color: #2ecc71; /* active green color for the label */
+}
+
+ion-icon {
+  font-size: 1.4rem;
+}
+
+ion-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}

@@ -1,0 +1,315 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>AI Recipe Assistant</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <!-- Step 1: Cooker Selection -->
+  <ion-card *ngIf="!generatedRecipe">
+    <ion-card-header>
+      <ion-card-title>1. Select Your Chef iQ Cooker</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngIf="cookers.length > 0" class="cooker-selection-grid">
+        <div
+          *ngFor="let cooker of cookers"
+          class="cooker-item"
+          [class.selected]="selectedCookerId === cooker._id"
+          (click)="selectCooker(cooker)"
+        >
+          <!-- MODIFICATION: Use the new helper function for image source -->
+          <img [src]="getCookerImageUrl(cooker.name)" alt="{{ cooker.name }}" class="cooker-image" />
+          <ion-label class="cooker-name">{{ cooker.name }}</ion-label>
+        </div>
+      </div>
+      <ion-text color="medium" *ngIf="cookers.length === 0" class="ion-padding-horizontal">Loading cookers...</ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Step 2: Ingredient Input -->
+  <ion-card *ngIf="selectedCookerId && !generatedRecipe">
+    <ion-card-header>
+      <ion-card-title>2. What Ingredients Do You Have?</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row class="ion-align-items-center">
+          <ion-col size="3" class="ion-no-padding">
+            <ion-item lines="none">
+              <ion-input
+                label="Qty"
+                labelPlacement="floating"
+                [(ngModel)]="currentQuantityInput"
+                (ionChange)="onIngredientInputChange()"
+                type="number"
+                min="0.1"
+                step="0.1"
+                placeholder="e.g., 2"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="4" class="ion-no-padding">
+            <ion-item lines="none">
+              <ion-select
+                label="Unit"
+                labelPlacement="floating"
+                [(ngModel)]="currentUnitInput"
+                (ionChange)="onIngredientInputChange()"
+                placeholder="Select Unit"
+              >
+                <ion-select-option value="">-- Select --</ion-select-option>
+                <ion-select-option *ngFor="let unit of standardUnits" [value]="unit">{{ unit }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col size="5" class="ion-no-padding">
+            <ion-item lines="none">
+              <ion-input
+                label="Ingredient"
+                labelPlacement="floating"
+                [(ngModel)]="currentNameInput"
+                (ionChange)="onIngredientInputChange()"
+                (keyup.enter)="validateAndAddIngredient()"
+                type="text"
+                placeholder="e.g., Chicken Breast"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12">
+            <ion-button expand="block" (click)="validateAndAddIngredient()" [disabled]="isAddIngredientButtonDisabled || isIngredientValidating">
+              <ion-spinner *ngIf="isIngredientValidating" name="dots"></ion-spinner>
+              <span *ngIf="!isIngredientValidating">Add Ingredient</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-text color="danger" *ngIf="ingredientValidationMessage" class="ion-padding-horizontal ion-text-wrap ion-margin-top">
+        {{ ingredientValidationMessage }}
+      </ion-text>
+
+      <ion-list *ngIf="addedIngredients.length > 0" class="ion-margin-top">
+        <ion-item *ngFor="let ingredient of addedIngredients; let i = index">
+          <ion-label class="ion-text-wrap">
+            {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
+          </ion-label>
+          <ion-button slot="end" color="danger" (click)="removeIngredient(i)">Remove</ion-button>
+        </ion-item>
+      </ion-list>
+      <ion-text color="medium" *ngIf="addedIngredients.length === 0" class="ion-padding-horizontal">
+        No ingredients added yet.
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Step 3: Cooking Intent -->
+  <ion-card *ngIf="selectedCookerId && addedIngredients.length > 0 && !generatedRecipe">
+    <ion-card-header>
+      <ion-card-title>3. How Do You Want to Cook?</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-radio-group [(ngModel)]="cookingIntent">
+        <ion-item>
+          <ion-radio value="Only These Ingredients" labelPlacement="end">Only These Ingredients</ion-radio>
+          <ion-label class="ion-text-wrap ion-margin-start">Strictly use only what I've listed.</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-radio value="Including These Ingredients" labelPlacement="end">Including These Ingredients</ion-radio>
+          <ion-label class="ion-text-wrap ion-margin-start">Use these, and add complementary ingredients.</ion-label>
+        </ion-item>
+      </ion-radio-group>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Step 4: Optional Time Constraint -->
+  <ion-card *ngIf="selectedCookerId && addedIngredients.length > 0 && cookingIntent && !generatedRecipe">
+    <ion-card-header>
+      <ion-card-title>4. (Optional) Time Constraint</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-input
+          label="e.g., under 30 minutes, around 1 hour"
+          labelPlacement="floating"
+          [(ngModel)]="optionalTime"
+          type="text"
+        ></ion-input>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Generate Recipe Button -->
+  <ion-button
+    expand="block"
+    class="ion-margin-top ion-padding-horizontal"
+    (click)="generateRecipe()"
+    [disabled]="!canGenerateRecipe()"
+    *ngIf="!generatedRecipe"
+  >
+    <ion-spinner *ngIf="isGeneratingRecipe"></ion-spinner>
+    <span *ngIf="!isGeneratingRecipe">Generate My Recipe!</span>
+  </ion-button>
+
+  <ion-text color="danger" *ngIf="generateRecipeError" class="ion-padding ion-text-center">
+    <h3>{{ generateRecipeError }}</h3>
+  </ion-text>
+
+
+  <!-- AI Generated Recipe Display -->
+  <ion-card *ngIf="generatedRecipe">
+    <ion-card-header>
+      <ion-card-title>{{ generatedRecipe.title }}</ion-card-title>
+      <ion-card-subtitle>{{ generatedRecipe.description }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item lines="none">
+          <ion-label class="ion-text-wrap">
+            <h2>Cooker: {{ generatedRecipe.chef_iq_cooker?.name }}</h2>
+            <p><strong>Intent:</strong> {{ generatedRecipe.cooking_intent }}</p>
+            <p *ngIf="generatedRecipe.metadata.prepTime"><strong>Prep Time:</strong> {{ generatedRecipe.metadata.prepTime }}</p>
+            <p *ngIf="generatedRecipe.metadata.cookTime"><strong>Cook Time:</strong> {{ generatedRecipe.metadata.cookTime }}</p>
+            <p *ngIf="generatedRecipe.metadata.yield"><strong>Yield:</strong> {{ generatedRecipe.metadata.yield }}</p>
+            <p *ngIf="generatedRecipe.metadata.difficulty"><strong>Difficulty:</strong> {{ generatedRecipe.metadata.difficulty }}</p>
+            <p *ngIf="generatedRecipe.metadata.cuisine"><strong>Cuisine:</strong> {{ generatedRecipe.metadata.cuisine }}</p>
+            <p *ngIf="generatedRecipe.metadata.tags && generatedRecipe.metadata.tags.length > 0">
+              <strong>Tags:</strong> {{ generatedRecipe.metadata.tags.join(', ') }}
+            </p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item-divider>
+          <ion-label>Ingredients</ion-label>
+        </ion-item-divider>
+        <ion-item *ngFor="let ingredient of generatedRecipe.ingredients">
+          <ion-label>
+            {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
+          </ion-label>
+        </ion-item>
+
+        <ion-item-divider>
+          <ion-label>Instructions</ion-label>
+        </ion-item-divider>
+        <ion-item *ngFor="let step of generatedRecipe.steps">
+          <ion-label class="ion-text-wrap">
+            <strong>Step {{ step.stepNumber }}:</strong> {{ step.description }}
+          </ion-label>
+        </ion-item>
+
+        <ion-item-divider *ngIf="generatedRecipe.chef_iq_cooker?.name">
+          <ion-label>{{ generatedRecipe.chef_iq_cooker.name }} Settings</ion-label>
+        </ion-item-divider>
+        <ion-item *ngIf="generatedRecipe.chef_iq_cooker?.name">
+          <ion-label class="ion-text-wrap">
+            {{
+              generatedRecipe.chef_iq_cooker?.name &&
+              generatedRecipe.metadata?.cookTime &&
+              generatedRecipe.steps?.[0]?.description &&
+              !generatedRecipe.steps[0].description.includes(generatedRecipe.chef_iq_cooker.name)
+              ? 'Suggested Cooker Use: ' + generatedRecipe.chef_iq_cooker.name + ' - ' + generatedRecipe.metadata.cookTime
+              : 'Refer to instructions for cooker use.'
+            }}
+          </ion-label>
+        </ion-item>
+
+        <ion-item-divider *ngIf="generatedRecipe.why_this_recipe">
+          <ion-label>Why This Recipe?</ion-label>
+        </ion-item-divider>
+        <ion-item *ngIf="generatedRecipe.why_this_recipe">
+          <ion-label class="ion-text-wrap">
+            {{ generatedRecipe.why_this_recipe }}
+          </ion-label>
+        </ion-item>
+
+      </ion-list>
+
+      <!-- Post-Recipe Actions -->
+      <ion-grid class="ion-margin-top ion-padding-horizontal">
+        <ion-row class="ion-align-items-center ion-justify-content-center">
+          <ion-col size="auto" *ngIf="generatedRecipe.cooking_intent === 'Including These Ingredients' && generatedRecipe.shopping_list_suggestions && generatedRecipe.shopping_list_suggestions.length > 0">
+            <ion-button fill="outline" (click)="showShoppingList = !showShoppingList" class="action-button">
+              <ion-icon slot="start" name="list-outline"></ion-icon>
+              {{ showShoppingList ? 'Hide' : 'Show' }} Shopping List
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto" *ngIf="currentUser">
+            <ion-button fill="solid" color="primary" (click)="saveGeneratedRecipe()" [disabled]="isSavingRecipe" class="action-button">
+              <ion-spinner *ngIf="isSavingRecipe" slot="start"></ion-spinner>
+              <ion-icon *ngIf="!isSavingRecipe" slot="start" name="bookmarkOutline"></ion-icon>
+              Save Recipe
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="showShoppingList && generatedRecipe.shopping_list_suggestions && generatedRecipe.shopping_list_suggestions.length > 0" class="ion-margin-top">
+          <ion-col size="12">
+            <ion-card class="shopping-list-card">
+              <ion-card-header>
+                <ion-card-title>Suggested Shopping List</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list>
+                  <ion-item *ngFor="let item of generatedRecipe.shopping_list_suggestions">
+                    <ion-label>
+                      {{ item.quantity }} {{ item.unit }} {{ item.name }}
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- Feedback Section -->
+      <ion-card class="ion-margin-top feedback-card">
+        <ion-card-header>
+          <ion-card-title>Rate This Recipe</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="rating-stars">
+            <ion-icon
+              *ngFor="let starNum of [1,2,3,4,5]"
+              [name]="getStarIcon(starNum)"
+              (click)="setFeedbackRating(starNum)"
+              [color]="feedbackRating >= starNum ? 'warning' : 'medium'"
+              size="large"
+            ></ion-icon>
+          </div>
+          <ion-item lines="none" class="ion-margin-top">
+            <ion-textarea
+              label="Your comments (optional)"
+              labelPlacement="floating"
+              [(ngModel)]="feedbackComment"
+              rows="3"
+            ></ion-textarea>
+          </ion-item>
+          <ion-button expand="block" class="ion-margin-top" (click)="submitFeedback()" [disabled]="feedbackRating === 0 || isSubmittingFeedback">
+            <ion-spinner *ngIf="isSubmittingFeedback" slot="start"></ion-spinner>
+            <span *ngIf="!isSubmittingFeedback">Submit Feedback</span>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Floating Action Button to Reset/Start Over -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="generatedRecipe">
+    <ion-fab-button color="secondary" (click)="resetAiRecipeInputs()">
+      <ion-icon name="refresh"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Global Toast for messages -->
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [duration]="3000"
+    (didDismiss)="setOpenToast(false)"
+  ></ion-toast>
+
+</ion-content>

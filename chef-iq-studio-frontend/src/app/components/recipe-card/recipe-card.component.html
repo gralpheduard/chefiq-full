@@ -1,0 +1,68 @@
+<!-- src/app/components/recipe-card/recipe-card.component.html -->
+<ion-card class="recipe-card">
+  <!-- Image or placeholder -->
+  <ng-container *ngIf="recipe.mainImage; else noImage">
+    <img 
+      [src]="recipe.mainImage" 
+      [alt]="recipe.title + ' image'" 
+      class="recipe-card-image" 
+    />
+  </ng-container>
+
+  <ng-template #noImage>
+    <div class="recipe-card-placeholder">
+      <ion-icon name="image-outline" class="placeholder-icon"></ion-icon>
+      <p class="placeholder-text">No Image</p>
+    </div>
+  </ng-template>
+
+  <ion-card-header>
+    <ion-card-title>{{ recipe.title }}</ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <p class="recipe-description">
+      {{ recipe.description.substring(0, 120) }}
+      <span *ngIf="recipe.description.length > 120">...</span>
+    </p>
+
+    <!-- Metadata row -->
+    <ion-row class="ion-align-items-center ion-margin-top recipe-meta">
+      <ion-col size="auto" *ngIf="recipe.metadata?.difficulty">
+        <ion-chip color="tertiary" outline>
+          <ion-icon name="restaurant-outline"></ion-icon>
+          <ion-label>{{ recipe.metadata.difficulty }}</ion-label>
+        </ion-chip>
+      </ion-col>
+
+      <ion-col size="auto" *ngIf="recipe.metadata?.prepTime">
+        <ion-chip color="secondary" outline>
+          <ion-icon name="time-outline"></ion-icon>
+          <ion-label>{{ recipe.metadata.prepTime }} mins</ion-label>
+        </ion-chip>
+      </ion-col>
+
+      <ion-col size="auto" *ngIf="showPrivacy">
+        <ion-chip [color]="getPrivacyColor(recipe.privacy)" outline>
+          <ion-icon [name]="getPrivacyIcon(recipe.privacy)"></ion-icon>
+          <ion-label>{{ recipe.privacy | titlecase }}</ion-label>
+        </ion-chip>
+      </ion-col>
+    </ion-row>
+
+    <!-- Action buttons -->
+    <ion-row class="ion-justify-content-end action-row">
+      <ion-buttons>
+        <ion-button fill="clear" color="medium" (click)="onViewDetail()">
+          <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="primary" (click)="onEdit()">
+          <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="onDelete()">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-row>
+  </ion-card-content>
+</ion-card>

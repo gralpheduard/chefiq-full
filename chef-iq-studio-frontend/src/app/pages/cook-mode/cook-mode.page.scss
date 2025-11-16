@@ -1,0 +1,181 @@
+/* C:\Users\Ralph Gannaban\Desktop\dev\sideline\chefiq\frontend\src\app\pages\cook-mode\cook-mode.page.scss */
+
+:host {
+  ion-content {
+    --background: #f5f5f5; // Consistent with tab1 and recipe-detail
+  }
+
+  ion-toolbar {
+    --background: #ffffff;
+    --color: #000000;
+    border-bottom: 1px solid #e0e0e0; // Matches tab1 header style
+  }
+}
+
+// Ensure the main padding for the content is applied as intended
+ion-content.ion-padding {
+  --padding-start: 12px; // Consistent horizontal padding
+  --padding-end: 12px;
+  --padding-top: 16px; // Consistent top padding
+  --padding-bottom: 16px; // Consistent bottom padding
+}
+
+ion-card {
+  margin: 16px 0; // Consistent vertical margin, horizontal handled by content padding
+  border-radius: 16px; // Larger border-radius from tab1
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // Consistent box-shadow from tab1
+  background: #ffffff; // Explicitly white background
+  max-width: 600px;
+  color: #000; // Ensure card text defaults to dark
+}
+
+ion-card-header {
+  background: #ffffff; // Explicitly white background for header
+  padding: 16px; // Consistent padding
+  padding-bottom: 8px; // Adjust for tighter spacing
+}
+
+ion-card-title {
+  font-size: 1.2rem; // Adjusted for consistency (e.g., Recipe Overview in detail)
+  font-weight: bold; // Consistent font-weight
+  color: #000; // Explicitly dark
+  text-align: left; // Align left, consistent with other card titles
+}
+
+ion-card-content {
+  background: #ffffff; // Explicitly white background for content
+  padding: 8px 16px 16px; // Consistent padding
+}
+
+
+ion-list {
+  background: #ffffff; // Explicitly white background for list
+  padding: 0;
+}
+
+ion-item {
+  --inner-border-width: 0 0 0.55px 0; // Thinner border, consistent with recipe-detail
+  --inner-border-color: var(--ion-color-light); // Consistent light border
+  padding: 10px 0;
+  align-items: flex-start;
+  --background: #ffffff; // Explicitly white background for item
+  color: #000; // Ensure item text is dark
+}
+
+ion-item:last-child {
+  --inner-border-width: 0;
+}
+
+ion-item ion-label {
+  color: #000; // Explicitly set label color to dark
+  font-size: 0.95rem; // Consistent font size
+}
+
+.ingredient-notes {
+  font-style: italic;
+  color: #777; // Consistent darker grey for notes
+  font-size: 0.85rem;
+}
+
+.step-description {
+  font-size: 0.95rem; // Consistent with recipe-detail description
+  line-height: 1.6;
+  color: #555; // Consistent darker grey for descriptions
+  margin-bottom: 15px;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0 16px 0; // Adjusted padding to align with card margins
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.navigation-buttons ion-button {
+  flex: 1;
+  margin: 0 5px;
+  --padding-start: 15px;
+  --padding-end: 15px;
+  border-radius: 8px; // Slightly rounded buttons, consistent with app style
+  font-weight: 600; // More prominent text
+}
+
+.navigation-buttons ion-button:first-child {
+  margin-left: 0;
+}
+
+.navigation-buttons ion-button:last-child {
+  margin-right: 0;
+}
+
+.finish-icon {
+  font-size: 6em;
+  margin-bottom: 10px;
+}
+
+.ion-text-center.ion-padding-vertical {
+  background: #ffffff; // Ensure the finished phase section is white
+  margin: 16px 12px; // Apply card-like margins
+  border-radius: 16px; // Apply card-like border-radius
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // Apply card-like shadow
+  padding: 30px 16px; // More generous internal padding for the finished state
+}
+
+.ion-text-center.ion-padding-vertical h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--ion-color-success); // Ensure success message is distinct
+}
+.ion-text-center.ion-padding-vertical p {
+  color: #555; // Darker grey for readability
+  font-size: 1rem;
+}
+
+/* Step media options */
+.step-media-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--ion-color-light); // Changed from dashed to solid for consistency
+    justify-content: center;
+    background: #ffffff; // Explicitly white background
+}
+
+.step-media-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9em;
+    text-align: center;
+    width: 100px;
+}
+.step-media-item ion-label {
+    font-weight: bold; // Stronger font weight for labels
+    margin-bottom: 0;
+    white-space: nowrap;
+    color: #000; // Explicitly dark for media labels
+}
+
+.step-media-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--ion-color-light);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    ion-card {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+    .navigation-buttons {
+        margin-top: 30px;
+    }
+}

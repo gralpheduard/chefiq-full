@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/recipe-detail/{{ recipeId }}"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ recipe?.title || 'Cooking Mode' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="!recipe" class="ion-text-center ion-padding-top">
+    <ion-text color="medium">
+      <p>Loading recipe...</p>
+    </ion-text>
+  </div>
+
+  <div *ngIf="recipe">
+    <!-- Ingredients Phase -->
+    <div *ngIf="currentPhase === 'ingredients'">
+      <ion-card class="ion-margin-bottom">
+        <ion-card-header>
+          <ion-card-title>Ingredients</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="recipe.ingredients && recipe.ingredients.length > 0; else noIngredients">
+            <ion-list lines="full">
+              <ion-item *ngFor="let ingredient of recipe.ingredients">
+                <ion-icon name="list-outline" slot="start" color="medium"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                  {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }} <span *ngIf="ingredient.notes" class="ingredient-notes">({{ ingredient.notes }})</span>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+          <ng-template #noIngredients>
+            <ion-text color="medium">
+              <p>No ingredients listed for this recipe.</p>
+            </ion-text>
+          </ng-template>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Steps Phase -->
+    <div *ngIf="currentPhase === 'steps'">
+      <ion-card class="ion-margin-bottom">
+        <ion-card-header>
+          <ion-card-title>Step {{ recipe.steps[currentStepIndex]?.stepNumber || (currentStepIndex + 1) }} of {{ recipe.steps.length }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="recipe.steps && recipe.steps.length > 0 && recipe.steps[currentStepIndex]">
+            <p class="step-description">{{ recipe.steps[currentStepIndex].description }}</p>
+
+            <div class="step-media-options ion-margin-top" *ngIf="recipe.steps[currentStepIndex].photoUrl || recipe.steps[currentStepIndex].videoUrl || recipe.steps[currentStepIndex].applianceIntegration">
+                <div *ngIf="recipe.steps[currentStepIndex].photoUrl" class="step-media-item">
+                    <ion-label color="medium">Photo:</ion-label>
+                    <img [src]="recipe.steps[currentStepIndex].photoUrl" alt="Step {{ currentStepIndex + 1 }} Photo" class="step-media-thumbnail">
+                    <!-- <ion-chip color="light" size="small"><ion-icon name="camera-outline"></ion-icon> View Photo</ion-chip> -->
+                </div>
+                <div *ngIf="recipe.steps[currentStepIndex].videoUrl" class="step-media-item">
+                    <ion-label color="medium">Video:</ion-label>
+                    <ion-chip color="light" size="small"><ion-icon name="videocam-outline"></ion-icon> Watch Video</ion-chip>
+                </div>
+                <div *ngIf="recipe.steps[currentStepIndex].applianceIntegration?.type" class="step-media-item">
+                    <ion-label color="medium">Appliance:</ion-label>
+                    <ion-chip color="tertiary" size="small">
+                        <ion-icon name="hardware-chip-outline"></ion-icon> {{ recipe.steps[currentStepIndex].applianceIntegration?.type | titlecase }}
+                        <span *ngIf="recipe.steps[currentStepIndex].applianceIntegration?.notes"> ({{ recipe.steps[currentStepIndex].applianceIntegration?.notes }})</span>
+                    </ion-chip>
+                </div>
+            </div>
+          </div>
+          <div *ngIf="!(recipe.steps && recipe.steps.length > 0 && recipe.steps[currentStepIndex])">
+            <ion-text color="medium">
+              <p>No instructions for this recipe.</p>
+            </ion-text>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Finished Phase -->
+    <div *ngIf="currentPhase === 'finished'" class="ion-text-center ion-padding-vertical">
+      <ion-icon name="checkmark-circle-outline" color="success" class="finish-icon"></ion-icon>
+      <ion-text color="success">
+        <h1>Congratulations!</h1>
+      </ion-text>
+      <ion-text color="medium">
+        <p>You've successfully completed cooking "{{ recipe.title }}"!</p>
+        <p>Enjoy your meal!</p>
+      </ion-text>
+      <ion-button expand="block" color="primary" class="ion-margin-top" (click)="finishCooking()">
+        Go Back to Recipe Details
+      </ion-button>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons ion-margin-top" *ngIf="currentPhase !== 'finished'">
+      <ion-button fill="outline" color="medium" (click)="previousPhase()" [disabled]="!showPreviousButton">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Previous
+      </ion-button>
+      <ion-button fill="solid" (click)="nextPhase()" [disabled]="!showNextButton">
+        {{ currentPhase === 'ingredients' ? 'Start Cooking' : (currentStepIndex === recipe.steps.length - 1 ? 'Finish Steps' : 'Next Step') }}
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

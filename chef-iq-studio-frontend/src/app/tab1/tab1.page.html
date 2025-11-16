@@ -1,0 +1,114 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title class="page-title">🍳 Home</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onLogout()" color="danger" fill="clear">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <div *ngIf="currentUser" class="dashboard">
+    <!-- Chiq Categories Section -->
+    <div class="chiq-categories">
+      <div class="chiq-item">
+        <img src='assets/images/chiq1.png' alt="Healthy">
+        <p>Healthy</p>
+      </div>
+      <div class="chiq-item">
+        <img src='assets/images/chiq2.png' alt="Comfort">
+        <p>Comfort</p>
+      </div>
+      <div class="chiq-item">
+        <img src='assets/images/chiq3.png' alt="Quick & Easy">
+        <p>Quick & Easy</p>
+      </div>
+      <div class="chiq-item">
+        <img src='assets/images/chiq4.png' alt="Others">
+        <p>Others</p>
+      </div>
+    </div>
+    <!-- End Chiq Categories Section -->
+
+    <h1 class="welcome-text">👋 Hi, <span>{{ currentUser.name }}</span>!</h1>
+
+    <!-- Suggest Connections -->
+    <ion-card *ngIf="!hasFollowing && !hasFollowers" class="empty-card">
+      <ion-card-header>
+        <ion-card-subtitle>Connect with others</ion-card-subtitle>
+        <ion-card-title>Find New Chefs</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="info-text">
+          You haven’t followed anyone or gained followers yet.
+        </p>
+        <ion-button expand="block" shape="round" (click)="navigateToSearchUsers()">
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+          Explore Chefs
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Public Recipes Section -->
+    <!-- <h2 class="section-title">🥗 Public Recipes</h2> -->
+
+    <div *ngIf="publicRecipes.length > 0" class="recipes-grid">
+      <ion-card
+        *ngFor="let recipe of publicRecipes"
+        class="recipe-card"
+      >
+        <div class="card-image-wrapper" (click)="goToRecipeDetail(recipe._id)">
+          <img [src]="recipe.mainImage || 'assets/placeholder.png'" alt="Recipe Image" />
+          <div class="image-overlay"></div>
+          <ion-button
+            class="save-button"
+            fill="clear"
+            color="light"
+            (click)="toggleSave(recipe, $event); $event.stopPropagation();"
+          >
+          <ion-icon
+              [name]="recipe._isSaved ? 'bookmark-sharp' : 'bookmark-outline'"
+              [color]="recipe._isSaved ? 'warning' : 'medium'"
+              size="large"
+            ></ion-icon>
+          </ion-button>
+        </div>
+
+        <ion-card-content>
+          <h3 class="recipe-title">{{ recipe.title }}</h3>
+          <p class="recipe-description">{{ recipe.description }}</p>
+          <p class="recipe-owner">👩‍🍳 {{ recipe.user.name || 'Unknown' }}</p>
+
+          <div class="recipe-actions">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="toggleLike(recipe,$event); $event.stopPropagation();"
+            >
+              <ion-icon
+                [name]="recipe._hasLiked ? 'heart-sharp' : 'heart-outline'"
+                [color]="recipe._hasLiked ? 'danger' : 'medium'"
+              ></ion-icon>
+              <ion-badge>{{ recipe.likes.length || 0 }}</ion-badge>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <div *ngIf="publicRecipes.length === 0" class="empty-state">
+      <ion-text color="medium">
+        <p>No public recipes yet. Be the first to create one!</p>
+      </ion-text>
+    </div>
+  </div>
+
+  <div *ngIf="!currentUser" class="empty-state">
+    <ion-text color="danger">
+      <p>You are not logged in. Please log in to view this content.</p>
+      <ion-button expand="block" routerLink="/login" shape="round">Go to Login</ion-button>
+    </ion-text>
+  </div>
+</ion-content>

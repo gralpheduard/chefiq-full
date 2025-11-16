@@ -1,0 +1,51 @@
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--ion-color-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.camera-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  --border-radius: 50%;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+}
+
+.profile-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #222;
+}
+
+.profile-email {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.logout-btn {
+  margin: 20px;
+  font-weight: 600;
+  --box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+}

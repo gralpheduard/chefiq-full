@@ -1,0 +1,251 @@
+/* C:\Users\Ralph Gannaban\Desktop\dev\sideline\chefiq\frontend\src\app\pages\recipe-detail\recipe-detail.page.scss */
+
+// ... (previous :host, .recipe-detail-container, ion-card, .recipe-header-section, .card-image-wrapper, .recipe-main-image, .ion-padding styles remain the same) ...
+
+/* Typography - Matching tab1 styles */
+.recipe-title-detail {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000; // Explicitly dark
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.recipe-description-detail {
+  font-size: 0.9rem;
+  color: #555; // Explicitly dark gray
+  margin-bottom: 12px;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 16px;
+}
+
+.author-info ion-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  margin-right: 12px;
+}
+
+.author-info .created-by {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium); // This is likely a lighter grey, adjust if needed
+  display: block;
+}
+
+.recipe-owner-detail {
+  font-size: 1rem;
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+/* Privacy Display and Actions (Like/Save) */
+.privacy-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--ion-color-light);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-top: 16px;
+  background: #ffffff;
+}
+
+.privacy-display ion-chip {
+  margin-right: auto;
+  font-size: 0.85rem;
+  // Ensure chip text is visible against chip color
+  --color: #000; // Default dark text for chips
+}
+
+.privacy-display ion-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  font-size: 0.9em;
+  height: auto;
+}
+
+.privacy-display ion-badge {
+  --background: transparent;
+  --color: #000; // Explicitly black for the badge number
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 4px;
+  min-width: 1.5em;
+}
+
+/* Cook Now Button */
+.cook-now-container {
+  padding-bottom: 16px;
+  background: #ffffff;
+}
+
+.cook-now-container ion-button {
+  height: 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Recipe Overview, Ingredients, Instructions cards */
+ion-card {
+  margin: 16px 12px;
+}
+
+ion-card-header {
+  padding: 16px;
+  padding-bottom: 8px;
+  background: #ffffff;
+}
+ion-card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #000; // Explicitly dark
+  margin-bottom: 6px;
+}
+ion-card-content {
+  padding: 8px 16px 16px;
+  background: #ffffff;
+}
+
+// === NEW/MODIFIED STYLES FOR TEXT COLOR IN METADATA SECTION ===
+ion-card-content ion-list ion-item {
+  --background: #ffffff; // Ensure item background is white
+}
+
+ion-card-content ion-list ion-item ion-label {
+  color: #555; // Dark gray for the labels (e.g., "Difficulty:", "Yield:")
+  font-size: 0.95rem; // Adjust font size for consistency
+}
+
+ion-card-content ion-list ion-item ion-text[slot="end"] {
+  color: #000; // Black for the values (e.g., "Medium", "5", "5 mins")
+  font-size: 0.95rem; // Adjust font size for consistency
+}
+
+// Also for the "Tags:" label
+ion-card-content ion-list ion-item .tags-container ~ ion-label {
+    color: #555;
+    font-size: 0.95rem;
+}
+// === END NEW/MODIFIED STYLES ===
+
+/* Metadata Tags */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: flex-end;
+}
+.tags-container ion-chip {
+  --background: black; // Changed to dark background for tags
+  color: #ffffff; // White text for tags
+  font-size: 0.8em;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Ingredients & Steps List Items */
+ion-list {
+  background: #ffffff;
+}
+
+ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --inner-border-width: 0 0 0.55px 0;
+  align-items: flex-start;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  --background: #ffffff;
+  color: #000; // Ensure item text is dark by default
+}
+ion-item:last-child {
+  --inner-border-width: 0;
+}
+
+ion-item ion-label {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #000; // Explicitly dark for labels within items
+}
+
+ion-item ion-label h2 {
+    color: #000; // Ensure step numbers are black
+}
+
+.ingredient-notes {
+  font-style: italic;
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.step-description {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.step-media-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--ion-color-light);
+  padding-top: 10px;
+  background: #ffffff;
+}
+
+.step-media-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+.step-media-item ion-label {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0;
+  min-width: 60px;
+}
+
+.step-media-thumbnail {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--ion-color-light);
+}
+
+// Adjust default Ionic padding for ion-content so cards can provide their own
+ion-content {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
+/* Utility classes (if needed, extracted from original HTML) */
+.ion-margin-top-md {
+  margin-top: 16px !important;
+}
+.ion-margin-top {
+  margin-top: 12px !important;
+}
+.ion-margin-bottom {
+  margin-bottom: 16px !important;
+}
+.ion-padding-horizontal {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.ion-text-wrap {
+  white-space: normal !important;
+}

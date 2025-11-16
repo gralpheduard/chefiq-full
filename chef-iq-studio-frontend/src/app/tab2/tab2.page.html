@@ -1,0 +1,115 @@
+<!-- src/app/tab2/tab2.page.html -->
+<ion-header translucent>
+  <ion-toolbar class="bg-white shadow-sm">
+    <ion-title class="page-title">📖 My Cookbook</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/recipe-form" shape="round" color="success" fill="solid">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        New Recipe
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen class="bg-gray-50">
+  <div *ngIf="currentUser" class="cookbook-container">
+    <h2 class="section-title">🍴 Your Personal Recipes</h2>
+
+    <!-- If user has recipes -->
+    <div *ngIf="userRecipes.length > 0; else noRecipes" class="recipes-list">
+      <app-recipe-card
+        *ngFor="let recipe of userRecipes"
+        [recipe]="recipe"
+        [showActions]="true"
+        [showPrivacy]="true"
+        (viewDetail)="onViewRecipeDetail($event)"
+        (editRecipe)="onEditRecipe($event)"
+        (deleteRecipe)="onDeleteRecipe($event)"
+      ></app-recipe-card>
+    </div>
+
+    <!-- Empty state -->
+    <ng-template #noRecipes>
+      <ion-card class="empty-card">
+        <ion-card-content>
+          <ion-icon name="restaurant-outline" class="empty-icon"></ion-icon>
+          <h3>No Recipes Yet</h3>
+          <p>Start creating and building your personal cookbook today.</p>
+          <ion-button expand="block" shape="round" color="primary" routerLink="/recipe-form">
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            Create Your First Recipe
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+  </div>
+
+  <!-- Not logged in -->
+  <div *ngIf="!currentUser" class="auth-state">
+    <ion-card class="empty-card">
+      <ion-card-content>
+        <ion-icon name="lock-closed-outline" class="empty-icon danger"></ion-icon>
+        <h3>Please Log In</h3>
+        <p>You must be logged in to view your cookbook.</p>
+        <ion-button expand="block" routerLink="/login" shape="round" color="primary">
+          Go to Login
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+<style>
+  .page-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #1f2937; /* Gray-900 */
+  }
+
+  .cookbook-container {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 16px 0;
+    color: var(--ion-color-primary);
+  }
+
+  .recipes-list {
+    display: grid;
+    gap: 16px;
+  }
+
+  /* Empty & auth state cards */
+  .empty-card {
+    text-align: center;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 24px 16px;
+  }
+
+  .empty-icon {
+    font-size: 56px;
+    color: #9ca3af; /* Gray-400 */
+    margin-bottom: 12px;
+  }
+
+  .empty-icon.danger {
+    color: var(--ion-color-danger);
+  }
+
+  .empty-card h3 {
+    font-weight: 600;
+    margin: 8px 0;
+    font-size: 1.1rem;
+    color: #374151; /* Gray-700 */
+  }
+
+  .empty-card p {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    color: #6b7280; /* Gray-500 */
+  }
+</style>

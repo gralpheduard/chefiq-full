@@ -1,0 +1,164 @@
+<!-- C:\Users\Ralph Gannaban\Desktop\dev\sideline\chefiq\frontend\src\app\pages\recipe-detail\recipe-detail.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <!-- CORRECTED: ion-back-button closing tag -->
+      <ion-back-button defaultHref="/tabs/cookbook"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ recipe?.title || 'Recipe Details' }}</ion-title>
+    <ion-buttons slot="end" *ngIf="recipe && currentUser && recipe.user?._id === currentUser._id">
+        <ion-button routerLink="/recipe-form/{{ recipe._id }}">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Edit
+        </ion-button>
+        <ion-button color="danger" (click)="onDeleteRecipe()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Delete
+        </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div *ngIf="recipe" class="recipe-detail-container">
+
+    <!-- Recipe Header - Main Image, Title, Description -->
+    <div class="recipe-header-section">
+      <div class="card-image-wrapper">
+        <img *ngIf="recipe.mainImage" [src]="recipe.mainImage" [alt]="recipe.title + ' main image'" class="recipe-main-image">
+      </div>
+
+      <div class="ion-padding">
+        <h2 class="ion-no-margin ion-text-wrap recipe-title-detail">{{ recipe.title }}</h2>
+        <ion-text color="medium">
+            <p class="ion-text-wrap recipe-description-detail">{{ recipe.description }}</p>
+        </ion-text>
+
+        <div class="author-info" *ngIf="recipe.user">
+          <ion-avatar class="ion-margin-end">
+            <img [src]="recipe.user.profileImage || 'assets/images/chef-default-dp.png'" alt="Chef Profile">
+          </ion-avatar>
+          <ion-label>
+            <span class="created-by">Created by</span>
+            <h4 class="ion-no-margin recipe-owner-detail" [routerLink]="['/user-profile', recipe.user._id]">{{ recipe.user.name }}</h4>
+          </ion-label>
+        </div>
+
+        <ion-item lines="none" class="privacy-display">
+            <ion-chip [color]="getPrivacyColor(recipe.privacy)">
+                <ion-icon [name]="getPrivacyIcon(recipe.privacy)"></ion-icon>
+                <ion-label>{{ recipe.privacy | titlecase }}</ion-label>
+            </ion-chip>
+            <ion-button fill="clear" color="danger" slot="end" (click)="toggleLike(recipe)" [disabled]="!currentUser">
+              <ion-icon [name]="recipe._hasLiked ? 'heart-sharp' : 'heart-outline'" [color]="recipe._hasLiked ? 'danger' : 'medium'"></ion-icon>
+              <ion-badge  class="ion-margin-start">{{ recipe.likes.length || 0 }}</ion-badge>
+            </ion-button>
+            <ion-button fill="clear" slot="end" (click)="toggleSave(recipe)" [disabled]="!currentUser">
+              <ion-icon [name]="recipe._isSaved ? 'bookmark-sharp' : 'bookmark-outline'" [color]="recipe._isSaved ? 'warning' : 'medium'"></ion-icon>
+            </ion-button>
+        </ion-item>
+
+        <div class="ion-padding-horizontal cook-now-container">
+          <ion-button expand="block" color="success" class="ion-margin-top" (click)="onCookNow(recipe._id!)" [disabled]="!recipe.ingredients?.length && !recipe.steps?.length">
+            <ion-icon name="restaurant-outline" slot="start"></ion-icon>
+            Cook Now
+          </ion-button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Recipe Metadata Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Recipe Overview</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label color="medium">Difficulty:</ion-label>
+            <ion-text slot="end" color="dark">{{ recipe.metadata.difficulty }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label color="medium">Yield:</ion-label>
+            <ion-text slot="end" color="dark">{{ recipe.metadata.yield }}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label color="medium">Prep Time:</ion-label>
+            <ion-text slot="end" color="dark">{{ recipe.metadata.prepTime }} mins</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label color="medium">Cook Time:</ion-label>
+            <ion-text slot="end" color="dark">{{ recipe.metadata.cookTime }} mins</ion-text>
+          </ion-item>
+          <ion-item *ngIf="recipe.metadata.tags && recipe.metadata.tags.length > 0">
+            <ion-label color="medium">Tags:</ion-label>
+            <div slot="end" class="tags-container">
+              <ion-chip *ngFor="let tag of recipe.metadata.tags">{{ tag }}</ion-chip>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Ingredients Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Ingredients</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="full">
+          <ion-item *ngFor="let ingredient of recipe.ingredients">
+            <ion-icon name="list-outline" slot="start" color="medium"></ion-icon>
+            <ion-label class="ion-text-wrap">
+              {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }} <span *ngIf="ingredient.notes" class="ingredient-notes">({{ ingredient.notes }})</span>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Instructions (Steps) Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Instructions</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="full">
+          <ion-item *ngFor="let step of recipe.steps; let i = index">
+            <ion-label class="ion-text-wrap">
+              <h2>Step {{ step.stepNumber || (i + 1) }}</h2>
+              <p class="step-description">{{ step.description }}</p>
+
+              <div class="step-media-options" *ngIf="step.photoUrl || step.videoUrl || step.applianceIntegration">
+                  <div *ngIf="step.photoUrl" class="step-media-item">
+                      <ion-label color="medium">Photo:</ion-label>
+                      <img [src]="step.photoUrl" alt="Step {{ step.stepNumber }} Photo" class="step-media-thumbnail">
+                      <ion-chip color="light" size="small"><ion-icon name="camera-outline"></ion-icon> View Photo</ion-chip>
+                  </div>
+                  <div *ngIf="step.videoUrl" class="step-media-item">
+                      <ion-label color="medium">Video:</ion-label>
+                      <ion-chip color="light" size="small"><ion-icon name="videocam-outline"></ion-icon> Watch Video</ion-chip>
+                  </div>
+                  <div *ngIf="step.applianceIntegration?.type" class="step-media-item">
+                      <ion-label color="medium">Appliance Integration:</ion-label>
+                      <ion-chip color="tertiary" size="small">
+                          <ion-icon name="hardware-chip-outline"></ion-icon> {{ step.applianceIntegration?.type | titlecase }}
+                          <span *ngIf="step.applianceIntegration?.notes"> ({{ step.applianceIntegration?.notes }})</span>
+                      </ion-chip>
+                  </div>
+              </div>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <div *ngIf="!recipe" class="ion-padding ion-text-center">
+    <ion-text color="medium">
+      <p>Recipe not found or loading...</p>
+    </ion-text>
+  </div>
+</ion-content>

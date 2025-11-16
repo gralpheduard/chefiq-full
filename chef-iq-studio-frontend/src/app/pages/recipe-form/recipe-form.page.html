@@ -1,0 +1,390 @@
+<!-- src/app/pages/recipe-form/recipe-form.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/cookbook"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Edit Recipe' : 'New Recipe' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Progress Indicator -->
+  <div class="progress-header">
+    <ion-progress-bar [value]="(currentSlideIndex + 1) / totalSlides"></ion-progress-bar>
+    <div class="step-counter">Step {{ currentSlideIndex + 1 }} of {{ totalSlides }}</div>
+  </div>
+
+  <form [formGroup]="recipeForm" class="form-wrapper">
+    <!-- Slide 1: General Information -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 0">
+      <div class="slide-content" [formGroupName]="'generalInfo'">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>1. General Information</ion-card-title>
+            <ion-card-subtitle>Basic details that make your recipe discoverable</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Recipe Title <ion-text color="danger">*</ion-text></ion-label>
+              <ion-input formControlName="title" type="text" maxlength="100"></ion-input>
+              <ion-note slot="end" *ngIf="generalInfoGroup.get('title')?.invalid && generalInfoGroup.get('title')?.touched" color="danger">Required (max 100)</ion-note>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Description <ion-text color="danger">*</ion-text></ion-label>
+              <ion-textarea formControlName="description" autoGrow="true" maxlength="1000"></ion-textarea>
+              <ion-note slot="end" *ngIf="generalInfoGroup.get('description')?.invalid && generalInfoGroup.get('description')?.touched" color="danger">Required (max 1000)</ion-note>
+            </ion-item>
+
+            <ion-item class="ion-margin-top">
+              <ion-label position="stacked">Privacy <ion-text color="danger">*</ion-text></ion-label>
+              <ion-select formControlName="privacy" interface="popover" placeholder="Select Privacy Level">
+                <ion-select-option *ngFor="let option of privacyOptions" [value]="option">
+                  <ion-icon slot="start" [name]="option === 'public' ? 'globe-outline' : (option === 'friends' ? 'people-outline' : 'lock-closed-outline')"></ion-icon>
+                  {{ option | titlecase }}
+                </ion-select-option>
+              </ion-select>
+              <ion-note slot="end" *ngIf="generalInfoGroup.get('privacy')?.invalid && generalInfoGroup.get('privacy')?.touched" color="danger">Required</ion-note>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Slide 2: Main Image Upload -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 1">
+      <div class="slide-content" [formGroupName]="'generalInfo'">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>2. Main Recipe Image</ion-card-title>
+            <ion-card-subtitle>A captivating image makes your recipe stand out!</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item lines="none">
+              <ion-label position="stacked">Select Image File</ion-label>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+            </ion-item>
+
+            <div *ngIf="selectedMainImageFile" class="ion-margin-top ion-text-center">
+              <ion-label>Ready to upload: {{ selectedMainImageFile.name }}</ion-label>
+              <ion-button expand="block" class="ion-margin-top" (click)="uploadMainImage()" [disabled]="isUploadingImage">
+                <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+                {{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}
+              </ion-button>
+            </div>
+
+            <div *ngIf="mainImagePreviewUrl" class="ion-margin-top ion-text-center">
+              <ion-label>Current Main Image:</ion-label>
+              <ion-img [src]="mainImagePreviewUrl" alt="Recipe Main Image" class="main-image-preview"></ion-img>
+              <ion-note *ngIf="generalInfoGroup.get('mainImage')?.value" class="ion-display-block">
+                Image URL: {{ generalInfoGroup.get('mainImage')?.value }}
+              </ion-note>
+            </div>
+
+            <ion-note color="medium" class="ion-padding-top">
+              Note: Click "Upload Image" after selecting a file to save it to the recipe. When editing, re-upload if changed.
+            </ion-note>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Slide 3: Ingredients -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 2">
+      <div class="slide-content">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>3. Ingredients <ion-text color="danger">*</ion-text></ion-card-title>
+            <ion-card-subtitle>List everything needed — quantity, unit, and notes</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content [formArrayName]="'ingredients'">
+            <div *ngFor="let ingredientControl of ingredients.controls; let i = index" [formGroupName]="i" class="ingredient-row">
+              <ion-row>
+                <ion-col size="10">
+                  <ion-item>
+                    <ion-label position="stacked">Name <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-input formControlName="name" type="text"></ion-input>
+                    <ion-note slot="end" *ngIf="ingredientControl.get('name')?.invalid && ingredientControl.get('name')?.touched" color="danger">Required</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label position="stacked">Quantity <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-input formControlName="quantity" type="number" min="0.01"></ion-input>
+                    <ion-note slot="end" *ngIf="ingredientControl.get('quantity')?.invalid && ingredientControl.get('quantity')?.touched" color="danger">Required (>0)</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label position="stacked">Unit <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-select formControlName="unit" interface="popover" placeholder="Select Unit">
+                      <ion-select-option *ngFor="let unit of unitOptions" [value]="unit">{{ unit }}</ion-select-option>
+                    </ion-select>
+                    <ion-note slot="end" *ngIf="ingredientControl.get('unit')?.invalid && ingredientControl.get('unit')?.touched" color="danger">Required</ion-note>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label position="stacked">Notes (e.g., 'finely chopped')</ion-label>
+                    <ion-input formControlName="notes" type="text"></ion-input>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="2" class="ion-align-self-center remove-col">
+                  <ion-button fill="clear" color="danger" (click)="removeIngredient(i)" [disabled]="ingredients.length <= 1" type="button">
+                    <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </div>
+
+            <ion-button expand="block" fill="outline" (click)="addIngredient()" type="button">
+              <ion-icon name="add-outline" slot="start"></ion-icon> Add Ingredient
+            </ion-button>
+
+            <ion-note color="danger" *ngIf="ingredients.invalid && ingredients.touched">At least one ingredient is required.</ion-note>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Slide 4: Steps -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 3">
+      <div class="slide-content">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>4. Steps <ion-text color="danger">*</ion-text></ion-card-title>
+            <ion-card-subtitle>Describe the process step-by-step</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content [formArrayName]="'steps'">
+            <div *ngFor="let stepControl of steps.controls; let i = index" [formGroupName]="i" class="step-row">
+              <ion-row class="ion-align-items-center">
+                <ion-col size="1">
+                  <div class="step-number">{{ stepControl.get('stepNumber')?.value }}.</div>
+                </ion-col>
+
+                <ion-col size="9">
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Description <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-textarea formControlName="description" autoGrow="true"></ion-textarea>
+                    <ion-note slot="end" *ngIf="stepControl.get('description')?.invalid && stepControl.get('description')?.touched" color="danger">Required</ion-note>
+                  </ion-item>
+
+                  <ion-item lines="none" class="media-row">
+                    <ion-label>Media / Appliance (optional)</ion-label>
+                    <ion-buttons>
+                      <ion-button fill="clear" color="medium"><ion-icon name="camera-outline" slot="icon-only"></ion-icon></ion-button>
+                      <ion-button fill="clear" color="medium"><ion-icon name="videocam-outline" slot="icon-only"></ion-icon></ion-button>
+                      <ion-button fill="clear" color="medium"><ion-icon name="hardware-chip-outline" slot="icon-only"></ion-icon></ion-button>
+                    </ion-buttons>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="2" class="ion-align-self-center remove-col">
+                  <ion-button fill="clear" color="danger" (click)="removeStep(i)" [disabled]="steps.length <= 1" type="button">
+                    <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </div>
+
+            <ion-button expand="block" fill="outline" (click)="addStep()" type="button">
+              <ion-icon name="add-outline" slot="start"></ion-icon> Add Step
+            </ion-button>
+
+            <ion-note color="danger" *ngIf="steps.invalid && steps.touched">At least one step is required.</ion-note>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Slide 5: Metadata -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 4">
+      <div class="slide-content" [formGroupName]="'metadata'">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>5. Metadata</ion-card-title>
+            <ion-card-subtitle>Details to help filters & sorting</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Difficulty <ion-text color="danger">*</ion-text></ion-label>
+              <ion-select formControlName="difficulty" interface="popover" placeholder="Select One">
+                <ion-select-option *ngFor="let diff of difficultyOptions" [value]="diff">{{ diff }}</ion-select-option>
+              </ion-select>
+              <ion-note slot="end" *ngIf="metadataGroup.get('difficulty')?.invalid && metadataGroup.get('difficulty')?.touched" color="danger">Required</ion-note>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Yield <ion-text color="danger">*</ion-text></ion-label>
+              <ion-input formControlName="yield" type="text" placeholder="e.g., 4 servings, 12 cookies"></ion-input>
+              <ion-note slot="end" *ngIf="metadataGroup.get('yield')?.invalid && metadataGroup.get('yield')?.touched" color="danger">Required</ion-note>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Prep Time (minutes)</ion-label>
+              <ion-input formControlName="prepTime" type="number" min="0"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Cook Time (minutes)</ion-label>
+              <ion-input formControlName="cookTime" type="number" min="0"></ion-input>
+            </ion-item>
+
+            <ion-item class="ion-margin-top">
+              <ion-label position="stacked">Tags (Cuisine)</ion-label>
+              <ion-select multiple="true" interface="popover" placeholder="Select Cuisine Tags" (ionChange)="onSelectTag($event, 'cuisine')" [value]="getSelectedCuisineTags()">
+                <ion-select-option *ngFor="let tag of cuisineTags" [value]="tag">{{ tag }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Tags (Diet)</ion-label>
+              <ion-select multiple="true" interface="popover" placeholder="Select Diet Tags" (ionChange)="onSelectTag($event, 'diet')" [value]="getSelectedDietTags()">
+                <ion-select-option *ngFor="let tag of dietTags" [value]="tag">{{ tag }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item class="ion-margin-bottom">
+              <ion-label position="stacked">Tags (Course)</ion-label>
+              <ion-select multiple="true" interface="popover" placeholder="Select Course Tags" (ionChange)="onSelectTag($event, 'course')" [value]="getSelectedCourseTags()">
+                <ion-select-option *ngFor="let tag of courseTags" [value]="tag">{{ tag }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <div class="selected-tags" *ngIf="metadataTags.length > 0">
+              <ion-label>Selected Tags:</ion-label>
+              <div class="tag-chips">
+                <ion-chip *ngFor="let tagControl of metadataTags.controls; let i = index">
+                  <ion-label>{{ tagControl.value }}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Slide 6: Review and Actions -->
+    <div class="slide-container" *ngIf="currentSlideIndex === 5">
+      <div class="slide-content">
+        <ion-card class="step-card ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>6. Review & Save</ion-card-title>
+            <ion-card-subtitle>Review your recipe details before saving.</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="none" class="review-list">
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Title:</ion-label>
+                <p>{{ generalInfoGroup.get('title')?.value || 'N/A' }}</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Description:</ion-label>
+                <p>{{ generalInfoGroup.get('description')?.value || 'N/A' }}</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Main Image:</ion-label>
+                <div *ngIf="generalInfoGroup.get('mainImage')?.value; else noMainImage">
+                  <ion-img [src]="generalInfoGroup.get('mainImage')?.value" alt="Main Recipe Image" class="main-image-preview-review"></ion-img>
+                </div>
+                <ng-template #noMainImage>
+                  <p class="ion-text-danger">No main image uploaded. Required for saving.</p>
+                </ng-template>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Privacy:</ion-label>
+                <p>{{ (generalInfoGroup.get('privacy')?.value | titlecase) || 'N/A' }}</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Ingredients ({{ ingredients.length }}):</ion-label>
+                <ul class="ion-padding-start">
+                  <li *ngFor="let ingredientControl of ingredients.controls">
+                    {{ ingredientControl.get('quantity')?.value }} {{ ingredientControl.get('unit')?.value }} {{ ingredientControl.get('name')?.value }}
+                    <span *ngIf="ingredientControl.get('notes')?.value">({{ ingredientControl.get('notes')?.value }})</span>
+                  </li>
+                </ul>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Steps ({{ steps.length }}):</ion-label>
+                <ol class="ion-padding-start">
+                  <li *ngFor="let stepControl of steps.controls">
+                    {{ stepControl.get('stepNumber')?.value }}. {{ stepControl.get('description')?.value }}
+                  </li>
+                </ol>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Difficulty:</ion-label>
+                <p>{{ metadataGroup.get('difficulty')?.value || 'N/A' }}</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Yield:</ion-label>
+                <p>{{ metadataGroup.get('yield')?.value || 'N/A' }}</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item" *ngIf="metadataTags.length > 0">
+                <ion-label position="stacked">Tags:</ion-label>
+                <div class="ion-padding-bottom">
+                  <ion-chip class="tags-css" *ngFor="let tag of metadataTags.value">{{ tag }}</ion-chip>
+                </div>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Prep Time:</ion-label>
+                <p>{{ metadataGroup.get('prepTime')?.value || 0 }} mins</p>
+              </ion-item>
+
+              <ion-item lines="none" class="review-item">
+                <ion-label position="stacked">Cook Time:</ion-label>
+                <p>{{ metadataGroup.get('cookTime')?.value || 0 }} mins</p>
+              </ion-item>
+            </ion-list>
+
+            <ion-button expand="block" color="primary" (click)="onSubmit()" class="ion-margin-top"
+                        [disabled]="recipeForm.invalid || !generalInfoGroup.get('mainImage')?.value">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              Save Recipe
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </form>
+
+  <!-- Navigation Buttons below the cards -->
+  <div class="navigation-buttons">
+    <ion-row class="ion-align-items-center">
+      <ion-col size="auto" *ngIf="currentSlideIndex > 0">
+        <ion-button (click)="prevSlide()" fill="outline" color="medium" shape="round">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon> Back
+        </ion-button>
+      </ion-col>
+
+      <ion-col></ion-col>
+
+      <ion-col size="auto" *ngIf="currentSlideIndex < totalSlides - 1">
+        <ion-button (click)="nextSlide()" color="primary" shape="round">
+          Next <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-content>
+
+<!-- Local small styles (preview sizes) -->
+<style>
+  .main-image-preview {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  .main-image-preview-review {
+    max-width: 200px;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 5px;
+  }
+</style>

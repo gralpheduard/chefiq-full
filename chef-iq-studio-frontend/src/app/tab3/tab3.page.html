@@ -1,0 +1,408 @@
+<!-- src/app/tab3/tab3.page.html -->
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title class="page-title">Search</ion-title> <!-- Changed title to be more generic -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <!-- Segment for switching between Recipe and User search -->
+  <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)" mode="md" class="search-segment">
+    <ion-segment-button value="recipes" layout="icon-start">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <ion-label>Recipes</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="users" layout="icon-start">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>Chefs</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Recipe Search Section -->
+  <div *ngIf="selectedSegment === 'recipes'">
+    <div class="search-container">
+      <ion-searchbar
+        placeholder="Search for recipes by title, ingredients, or chef"
+        [(ngModel)]="recipeSearchTerm"
+        (ionChange)="onSearchChange($event)"
+        debounce="500"
+        animated
+        show-clear-button="focus"
+      ></ion-searchbar>
+    </div>
+
+    <!-- Found Recipes -->
+    <ion-list *ngIf="foundRecipes.length > 0" lines="none" class="recipe-list">
+      <ion-card *ngFor="let recipe of foundRecipes" class="recipe-card">
+        <ion-item lines="none" [routerLink]="['/recipe-detail', recipe._id]"> <!-- Assuming a recipe-detail route -->
+          <ion-avatar slot="start" class="recipe-avatar">
+           <img [src]="recipe.mainImage || 'assets/images/recipe-default.png'" alt="Recipe Image" />
+          </ion-avatar>
+
+          <ion-label>
+            <h2 class="recipe-title">{{ recipe.title }}</h2>
+            <p class="recipe-info">
+              by {{ recipe.user.name }}
+              <span class="likes-info">
+                <ion-icon name="heart" [color]="(recipe.likes && recipe.likes.length > 0) ? 'danger' : 'medium'" class="recipe-like-icon"></ion-icon>
+                {{ recipe.likes ? recipe.likes.length : 0 }}
+              </span>
+            </p>
+          </ion-label>
+          <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+        </ion-item>
+      </ion-card>
+    </ion-list>
+
+    <!-- Empty States for Recipes -->
+    <div *ngIf="foundRecipes.length === 0 && recipeSearchTerm.trim() !== ''" class="empty-state">
+      <ion-icon name="restaurant-outline" class="empty-icon"></ion-icon>
+      <h3>No Recipes Found</h3>
+      <p>We couldn’t find any recipes matching "{{ recipeSearchTerm }}".</p>
+    </div>
+
+    <div *ngIf="foundRecipes.length === 0 && recipeSearchTerm.trim() === ''" class="empty-state">
+      <ion-icon name="book-outline" class="empty-icon"></ion-icon>
+      <h3>Discover Recipes</h3>
+      <p>Start searching for amazing dishes!</p>
+    </div>
+  </div>
+
+  <!-- User Search Section (Your existing content, now conditional) -->
+  <div *ngIf="selectedSegment === 'users'">
+    <div class="search-container">
+      <ion-searchbar
+        placeholder="Search for chefs by name or email"
+        [(ngModel)]="searchTerm"
+        (ionChange)="onSearchChange($event)"
+        debounce="500"
+        animated
+        show-clear-button="focus"
+      ></ion-searchbar>
+    </div>
+
+    <div *ngIf="currentUser">
+      <!-- Found Users -->
+      <ion-list *ngIf="foundUsers.length > 0" lines="none" class="user-list">
+        <ion-card *ngFor="let user of foundUsers" class="user-card">
+          <ion-item lines="none">
+            <ion-avatar slot="start" class="chef-avatar" [routerLink]="['/user-profile', user._id]">
+             <img [src]="user.profileImage || 'assets/images/chef-default-dp.png'" alt="Profile Image" />
+            </ion-avatar>
+
+            <ion-label [routerLink]="['/user-profile', user._id]">
+              <h2 class="chef-name">{{ user.name }}</h2>
+              <p class="followers">{{ user.followersCount || 0 }} Followers</p>
+            </ion-label>
+
+            <ion-button
+              slot="end"
+              shape="round"
+              [fill]="user.isFollowing ? 'solid' : 'outline'"
+              [color]="user.isFollowing ? 'medium' : 'primary'"
+              (click)="toggleFollow(user); $event.stopPropagation();"
+              [disabled]="!currentUser || user._id === currentUserId"
+            >
+              <ion-icon
+                [name]="user.isFollowing ? 'person-remove-outline' : 'person-add-outline'"
+                slot="start"
+              ></ion-icon>
+              {{ user.isFollowing ? 'Following' : 'Follow' }}
+            </ion-button>
+          </ion-item>
+        </ion-card>
+      </ion-list>
+
+      <!-- Empty States -->
+      <div *ngIf="foundUsers.length === 0 && searchTerm.trim() !== ''" class="empty-state">
+        <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+        <h3>No Chefs Found</h3>
+        <p>We couldn’t find anyone matching "{{ searchTerm }}".</p>
+      </div>
+
+      <div *ngIf="foundUsers.length === 0 && searchTerm.trim() === ''" class="empty-state">
+        <ion-icon name="people-outline" class="empty-icon"></ion-icon>
+        <h3>No Chefs Yet</h3>
+        <p>Start following someone and build your network.</p>
+      </div>
+    </div>
+
+    <!-- Not Logged In -->
+    <div *ngIf="!currentUser" class="empty-state">
+      <ion-icon name="lock-closed-outline" class="empty-icon danger"></ion-icon>
+      <h3>Please Log In</h3>
+      <p>You need to log in to see other chefs.</p>
+      <ion-button expand="block" routerLink="/login" shape="round" color="primary">
+        Go to Login
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Your existing styles remain unchanged, with additions for new elements -->
+<style>
+  .search-segment {
+    margin-top: 10px;
+    padding: 0 16px;
+  }
+/* Existing .search-segment style */
+.search-segment {
+  margin-top: 10px;
+  padding: 0 16px;
+  /* Add a background to the segment itself if you want a clear container */
+  border-radius: 12px;
+  overflow: hidden; /* Important for border-radius to apply correctly */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Optional shadow for the segment container */
+}
+
+ion-segment-button {
+  text-transform: capitalize;
+  font-size: 0.95rem;
+  color: var(--ion-color-medium); /* Default text color */
+  background: transparent; /* Default background */
+  transition: all 0.2s ease-in-out; /* Smooth transition for hover/active states */
+}
+
+/* Styles for the SELECTED tab */
+ion-segment-button.segment-button-checked {
+  color: green; /* Primary text color for selected tab */
+  font-weight: 600; /* Make text bold */
+  border-bottom: 3px solid green; /* A strong indicator line */
+  /* If you want a background color for the selected button */
+  /* background: var(--ion-color-primary-shade); /* Or a lighter tint */
+}
+
+/* To ensure the icon also changes color when selected */
+ion-segment-button.segment-button-checked ion-icon {
+  color: green
+}
+
+/* Optional: Styles for unselected tab on hover (if desired) */
+ion-segment-button:not(.segment-button-checked):hover {
+  background: rgb(183, 183, 183); /* Light background on hover for unselected */
+}
+  .recipe-avatar {
+    border-radius: 8px; /* Slightly different border for recipes */
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+  }
+  .recipe-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ion-color-dark);
+  }
+  .recipe-info { /* Changed from recipe-chef to recipe-info for flexibility */
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+    margin-top: 2px;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically align items */
+  }
+  .likes-info {
+    display: inline-flex; /* Keep it inline with text but allow flex properties */
+    align-items: center;
+    margin-left: 8px; /* Space from chef's name */
+    color: var(--ion-color-medium); /* Default for 0 likes */
+  }
+  .recipe-like-icon {
+    font-size: 0.9rem; /* Slightly smaller icon */
+    margin-right: 2px;
+  }
+  .recipe-card {
+    border-radius: 16px;
+    margin: 10px 0;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+  }
+  .recipe-card:hover {
+    transform: scale(1.01);
+  }
+
+  /* Existing styles (Ensuring they are all present as you provided) */
+  ion-searchbar {
+  --border-radius: 14px;
+  --background: #ffffff !important;   /* force light background */
+  --color: #000000;              /* input text color */
+  --placeholder-color: #666666;  /* placeholder text color */
+}
+
+.user-card {
+  border-radius: 16px;
+  margin: 10px 0;
+  background: #ffffff !important;    /* force light card background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+.user-item {
+  --background: #ffffff !important;   /* force white background */
+  --color: var(--ion-color-dark);
+  border-radius: 14px;
+  margin: 8px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.user-item:hover {
+  transform: scale(1.01);
+}
+
+  .page-title {
+    font-weight: bold;
+    font-size: 1.3rem;
+  }
+
+  .search-container {
+    padding: 12px 16px;
+  }
+
+  ion-searchbar {
+    --border-radius: 14px;
+    --background: var(--ion-color-light);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .user-list, .recipe-list {
+    padding: 8px 12px;
+    background-color: white;
+  }
+
+  .user-card:hover {
+    transform: scale(1.01);
+  }
+
+  .chef-avatar {
+    border: 2px solid var(--ion-color-primary);
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .chef-name {
+    color:#000000;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .followers {
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+    margin: 2px 0 0 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    margin-top: 60px;
+    padding: 20px;
+    color: var(--ion-color-medium);
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 12px;
+  }
+
+  .empty-icon.danger {
+    color: var(--ion-color-danger);
+  }
+
+  .empty-state h3 {
+    font-weight: bold;
+    margin: 8px 0;
+    color: var(--ion-color-dark);
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    color: var(--ion-color-medium);
+  }
+
+/* Re-adding previous styles for clarity after new additions */
+ion-searchbar {
+  --border-radius: 14px;
+  --background: #ffffff !important;
+  --color: #000000;
+  --placeholder-color: #666666;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.user-list {
+  padding: 8px 16px;
+}
+
+.user-card {
+  border-radius: 16px;
+  margin: 12px 0;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+ion-item {
+  --background: transparent;
+  --inner-border-width: 0;
+  border-radius: 16px;
+}
+
+.chef-avatar {
+  border: 2px solid var(--ion-color-primary);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.chef-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ion-color-dark);
+}
+
+.followers {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin-top: 2px;
+}
+
+.page-title {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 60px;
+  padding: 20px;
+  color: var(--ion-color-medium);
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: var(--ion-color-medium);
+  margin-bottom: 12px;
+}
+
+.empty-icon.danger {
+  color: var(--ion-color-danger);
+}
+
+.empty-state h3 {
+  font-weight: bold;
+  margin: 8px 0;
+  color: var(--ion-color-dark);
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  color: var(--ion-color-medium);
+}
+</style>

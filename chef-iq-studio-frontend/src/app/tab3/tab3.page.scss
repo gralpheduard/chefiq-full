@@ -1,0 +1,83 @@
+ion-searchbar {
+  --border-radius: 14px;
+  --background: #ffffff !important;
+  --color: #000000;
+  --placeholder-color: #666666;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.user-list {
+  padding: 8px 16px;
+}
+
+.user-card {
+  border-radius: 16px;
+  margin: 12px 0;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+ion-item {
+  --background: transparent;
+  --inner-border-width: 0;
+  border-radius: 16px;
+}
+
+.chef-avatar {
+  border: 2px solid var(--ion-color-primary);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.chef-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ion-color-dark);
+}
+
+.followers {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin-top: 2px;
+}
+
+.page-title {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 60px;
+  padding: 20px;
+  color: var(--ion-color-medium);
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: var(--ion-color-medium);
+  margin-bottom: 12px;
+}
+
+.empty-icon.danger {
+  color: var(--ion-color-danger);
+}
+
+.empty-state h3 {
+  font-weight: bold;
+  margin: 8px 0;
+  color: var(--ion-color-dark);
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  color: var(--ion-color-medium);
+}

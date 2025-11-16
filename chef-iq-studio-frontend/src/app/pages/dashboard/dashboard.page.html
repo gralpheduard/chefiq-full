@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end">
+        <ion-button routerLink="/recipe-form" color="primary">
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            New Recipe
+        </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="currentUser">
+    <h1>Welcome, {{ currentUser.name }}!</h1>
+    <p>Email: {{ currentUser.email }}</p>
+
+    <ion-text>
+        <h2>My Recipes</h2>
+    </ion-text>
+
+    <ion-list *ngIf="userRecipes.length > 0; else noRecipes">
+        <ion-item *ngFor="let recipe of userRecipes" lines="full">
+            <ion-label>
+                <h3>{{ recipe.title }}</h3>
+                <p>{{ recipe.description.substring(0, 70) }}...</p>
+                <p>Status: <ion-text color="{{ recipe.status === 'published' ? 'success' : (recipe.status === 'submitted' ? 'warning' : 'medium') }}">
+                    {{ recipe.status | titlecase }}
+                </ion-text></p>
+            </ion-label>
+            <ion-buttons slot="end">
+                <ion-button fill="clear" routerLink="/recipe-detail/{{ recipe._id }}">
+                    <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" routerLink="/recipe-form/{{ recipe._id }}">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="success" (click)="onPublishRecipe(recipe._id!)" [disabled]="recipe.status !== 'draft'">
+                  <ion-icon name="checkmark-circle-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" (click)="onDeleteRecipe(recipe._id!)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+        </ion-item>
+    </ion-list>
+
+    <ng-template #noRecipes>
+        <ion-text color="medium">
+            <p class="ion-text-center">You haven't created any recipes yet.</p>
+            <ion-button expand="block" routerLink="/recipe-form" class="ion-margin-top">
+                <ion-icon name="add-outline" slot="start"></ion-icon>
+                Start Your First Recipe
+            </ion-button>
+        </ion-text>
+    </ng-template>
+
+    <ion-button expand="block" class="ion-margin-top" (click)="onLogout()" color="danger">Logout</ion-button>
+  </div>
+  <div *ngIf="!currentUser">
+    <ion-text color="danger">
+      <p>You are not logged in. Please log in to view this content.</p>
+      <ion-button expand="block" routerLink="/login">Go to Login</ion-button>
+    </ion-text>
+  </div>
+
+</ion-content>
