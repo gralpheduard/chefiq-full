@@ -1,5 +1,5 @@
 // src/environments/environment.ts
 export const environment = {
   production: false,
-apiUrl: 'https://chefiq.pahingacommunity.com/api', // Your backend base URL + /api prefix
+  apiUrl: 'http:localhost:5000/api', // Your backend base URL + /api prefix
 };
