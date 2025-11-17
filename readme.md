@@ -106,5 +106,4 @@ You now have the full setup for both frontend and backend:
 - **Frontend:** Install → Configure env → Build → Sync → Run on device/emulator
 - **Backend:** Install → Add env → Start server
 
-If you want me to generate an **API documentation**, **ERD**, **folder structure guide**, or **setup video script**, just tell me!
 
