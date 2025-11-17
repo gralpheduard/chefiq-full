@@ -1,3 +1,4 @@
+// /Users/ralphgannaban/Documents/dev/chefiq-full/chef-iq-studio-frontend/src/app/tab-ai/tab-ai.page.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,14 +14,19 @@ import {
   IonTextarea,
   IonFab,
   IonFabButton,
-  IonSelect, // Import IonSelect
-  IonSelectOption // Import IonSelectOption
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { heartOutline, heartSharp, bookmarkOutline, bookmarkSharp, listOutline, starHalfOutline, starOutline, star, refresh } from 'ionicons/icons';
 import { AiService, ChefIQCooker, IngredientInput, AIRecipe } from '../services/ai.service';
 import { AuthService, AuthResponse } from '../services/auth';
 import { Subscription } from 'rxjs';
+
+type CookingIntentOption = {
+  value: 'Only These Ingredients' | 'Including These Ingredients';
+  description: string;
+};
 
 @Component({
   selector: 'app-tab-ai',
@@ -40,8 +46,8 @@ import { Subscription } from 'rxjs';
     IonTextarea,
     IonFab,
     IonFabButton,
-    IonSelect, // Add IonSelect
-    IonSelectOption // Add IonSelectOption
+    IonSelect,
+    IonSelectOption
   ],
 })
 export class tabAiPage implements OnInit, OnDestroy {
@@ -50,9 +56,8 @@ export class tabAiPage implements OnInit, OnDestroy {
   selectedCookerId: string | null = null;
   selectedCookerName: string | null = null;
 
-  // New input fields for quantity, unit, and name
   currentQuantityInput: number | null = null;
-  currentUnitInput: string = ''; // This will now hold a value from the dropdown
+  currentUnitInput: string = '';
   currentNameInput: string = '';
 
   addedIngredients: IngredientInput[] = [];
@@ -61,6 +66,10 @@ export class tabAiPage implements OnInit, OnDestroy {
   isIngredientValidating: boolean = false;
 
   cookingIntent: 'Only These Ingredients' | 'Including These Ingredients' | null = null;
+  cookingIntents: CookingIntentOption[] = [
+    { value: 'Only These Ingredients', description: "Strictly use only what I've listed." },
+    { value: 'Including These Ingredients', description: "Use these, and add complementary ingredients." }
+  ];
   optionalTime: string = '';
 
   isGeneratingRecipe: boolean = false;
@@ -72,26 +81,21 @@ export class tabAiPage implements OnInit, OnDestroy {
 
   showShoppingList: boolean = false;
 
-  // *** MODIFICATION START: Standard units are already here ***
   standardUnits: string[] = [
-    'none', // For items like "1 onion" where the unit is implicitly "whole" or "piece"
+    'none',
     'whole', 'pieces', 'cloves', 'sheets', 'bunches', 'sprigs', 'stalks', 'cans', 'bottles', 'packs', 'leaves', 'slices', 'dashes', 'pinches',
     'grams', 'kg', 'ounces', 'lbs', 'pounds',
     'ml', 'liters', 'cups', 'fluid ounces', 'tablespoons', 'teaspoons',
-    'medium', 'large', 'small' // Descriptive units for items without standard weight/volume
+    'medium', 'large', 'small'
   ];
-  // *** MODIFICATION END ***
 
-  // --- Auth State ---
   currentUser: AuthResponse | null = null;
   private authSubscription: Subscription | undefined;
 
-  // --- Toast ---
   isToastOpen = false;
   toastMessage: string = '';
 
-  // --- Feedback ---
-  feedbackRating: number = 0; // For 5-star rating, 0 means not rated
+  feedbackRating: number = 0;
   feedbackComment: string = '';
   isSubmittingFeedback: boolean = false;
 
@@ -113,16 +117,13 @@ export class tabAiPage implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  // --- Utility Functions ---
   setOpenToast(isOpen: boolean, message: string = '') {
     this.isToastOpen = isOpen;
     this.toastMessage = message;
   }
 
-  // *** NEW FUNCTION ADDED HERE FOR IMAGE MAPPING ***
   getCookerImageUrl(cookerName: string): string {
-    console.log(cookerName)
-    switch (cookerName.toLowerCase()) { // Use toLowerCase for robustness
+    switch (cookerName.toLowerCase()) {
       case 'iq cooker':
         return 'assets/images/smarkcooker.png';
       case 'iq minioven':
@@ -130,25 +131,21 @@ export class tabAiPage implements OnInit, OnDestroy {
       case 'iq sense':
         return 'assets/images/cq.png';
       default:
-        return 'assets/images/placeholder-cooker.png'; // A generic fallback image
+        return 'assets/images/placeholder-cooker.png';
     }
   }
-  // *** END NEW FUNCTION ***
 
-
-  // --- Cooker Selection Logic ---
   loadCookers() {
     this.aiService.getChefIQCookers().subscribe({
       next: (cookers) => {
         this.cookers = cookers;
-        // Optionally pre-select the first cooker if available and nothing is selected
         if (cookers.length > 0 && !this.selectedCookerId) {
             this.selectCooker(cookers[0]);
         }
       },
       error: (err) => {
         console.error('Failed to load Chef iQ Cookers:', err);
-        this.setOpenToast(true, 'Failed to load cookers: ' + (err.message || 'Unknown error')); // Safer error message
+        this.setOpenToast(true, 'Failed to load cookers: ' + (err.message || 'Unknown error'));
       }
     });
   }
@@ -158,13 +155,13 @@ export class tabAiPage implements OnInit, OnDestroy {
     this.selectedCookerName = cooker.name;
   }
 
-  // --- Ingredient Input and Validation Logic ---
+  selectCookingIntent(intent: 'Only These Ingredients' | 'Including These Ingredients') {
+    this.cookingIntent = intent;
+  }
+
   onIngredientInputChange() {
-    this.ingredientValidationMessage = null; // Clear validation message
+    this.ingredientValidationMessage = null;
     const isQuantityValid = this.currentQuantityInput !== null && !isNaN(this.currentQuantityInput) && this.currentQuantityInput > 0;
-    // For unit, just check if it's selected (not empty or 'none' if 'none' is the default placeholder)
-    // If 'none' is a valid choice (e.g., for "1 onion"), then check for non-empty string.
-    // If you want to force a more descriptive unit, you could check `this.currentUnitInput !== 'none'`.
     const isUnitValid = this.currentUnitInput.trim() !== '';
     const isNameValid = this.currentNameInput.trim() !== '';
 
@@ -176,7 +173,6 @@ export class tabAiPage implements OnInit, OnDestroy {
     const unit = this.currentUnitInput.trim();
     const name = this.currentNameInput.trim();
 
-    // Client-side validation for the three fields
     if (quantity === null || isNaN(quantity) || quantity <= 0) {
       this.ingredientValidationMessage = 'Please enter a valid positive number for quantity.';
       this.isAddIngredientButtonDisabled = true;
@@ -193,7 +189,6 @@ export class tabAiPage implements OnInit, OnDestroy {
       return;
     }
 
-    // Check for duplicates based on name (case-insensitive, non-alphanumeric removed)
     const existingIngredient = this.addedIngredients.find(
       (ing) => this.normalizeIngredientName(ing.name) === this.normalizeIngredientName(name)
     );
@@ -204,22 +199,20 @@ export class tabAiPage implements OnInit, OnDestroy {
     }
 
     this.isIngredientValidating = true;
-    this.ingredientValidationMessage = null; // Clear previous messages
+    this.ingredientValidationMessage = null;
 
     try {
-      // Validate just the name with the backend's AI service
       const response = await this.aiService.validateIngredient(name).toPromise();
       if (response && response.isFood) {
         this.addedIngredients.push({
-          name: response.name, // Use the canonical name from backend
+          name: response.name,
           quantity: quantity,
-          unit: unit === 'none' ? '' : unit // Store 'none' as an empty string for cleaner display/backend
+          unit: unit === 'none' ? '' : unit
         });
-        // Clear inputs after successful addition
         this.currentQuantityInput = null;
-        this.currentUnitInput = ''; // Reset dropdown to default/empty
+        this.currentUnitInput = '';
         this.currentNameInput = '';
-        this.onIngredientInputChange(); // Re-evaluate button state
+        this.onIngredientInputChange();
         this.ingredientValidationMessage = null;
       } else {
         this.ingredientValidationMessage = response?.reason || 'This is not a recognized food item.';
@@ -231,21 +224,19 @@ export class tabAiPage implements OnInit, OnDestroy {
       this.isAddIngredientButtonDisabled = true;
     } finally {
       this.isIngredientValidating = false;
-      this.onIngredientInputChange(); // Re-evaluate button state
+      this.onIngredientInputChange();
     }
   }
 
   removeIngredient(index: number) {
     this.addedIngredients.splice(index, 1);
-    this.onIngredientInputChange(); // Re-evaluate button state
+    this.onIngredientInputChange();
   }
 
   private normalizeIngredientName(name: string): string {
-    return name.toLowerCase().replace(/[^a-z0-9]/g, ''); // Remove non-alphanumeric for comparison
+    return name.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
-
-  // --- Recipe Generation Logic ---
   canGenerateRecipe(): boolean {
     return (
       !!this.selectedCookerId &&
@@ -260,7 +251,7 @@ export class tabAiPage implements OnInit, OnDestroy {
     this.isGeneratingRecipe = true;
     this.generateRecipeError = null;
     this.generatedRecipe = null;
-    this.showShoppingList = false; // Reset shopping list view
+    this.showShoppingList = false;
 
     this.aiService.generateAIRecipe(
       this.selectedCookerId!,
@@ -270,12 +261,12 @@ export class tabAiPage implements OnInit, OnDestroy {
     ).subscribe({
       next: (recipe) => {
         this.generatedRecipe = recipe;
-        console.log('Generated Recipe:', recipe);
       },
       error: (err) => {
         console.error('Failed to generate recipe:', err);
         this.generateRecipeError = err.message || 'Failed to generate recipe. Please try again.';
-        this.setOpenToast(true, this.generateRecipeError || 'Unknown error during recipe generation.'); // Safely pass to toast
+        // *** FIX HERE: Provide a fallback string if generateRecipeError is null ***
+        this.setOpenToast(true, this.generateRecipeError || 'Unknown error during recipe generation.');
       },
       complete: () => {
         this.isGeneratingRecipe = false;
@@ -283,7 +274,6 @@ export class tabAiPage implements OnInit, OnDestroy {
     });
   }
 
-  // --- Save Recipe Logic ---
   saveGeneratedRecipe() {
     if (!this.generatedRecipe || !this.currentUser) {
       this.setOpenToast(true, 'Cannot save recipe: No recipe generated or not logged in.');
@@ -297,12 +287,12 @@ export class tabAiPage implements OnInit, OnDestroy {
       next: (response) => {
         this.saveRecipeMessage = response.message;
         this.setOpenToast(true, response.message);
-        // Optionally, update UI to show it's saved (e.g., disable save button)
       },
       error: (err) => {
         console.error('Failed to save recipe:', err);
         this.saveRecipeMessage = err.message || 'Failed to save recipe.';
-        this.setOpenToast(true, this.saveRecipeMessage || 'Unknown error saving recipe.'); // Safely pass to toast
+        // *** FIX HERE: Provide a fallback string if saveRecipeMessage is null ***
+        this.setOpenToast(true, this.saveRecipeMessage || 'Unknown error saving recipe.');
       },
       complete: () => {
         this.isSavingRecipe = false;
@@ -310,7 +300,6 @@ export class tabAiPage implements OnInit, OnDestroy {
     });
   }
 
-  // --- Feedback Logic ---
   submitFeedback() {
     if (!this.generatedRecipe || this.feedbackRating === 0) {
       this.setOpenToast(true, 'Please provide a rating before submitting feedback.');
@@ -321,8 +310,8 @@ export class tabAiPage implements OnInit, OnDestroy {
     this.aiService.submitAIRecipeFeedback(this.generatedRecipe._id, this.feedbackRating, this.feedbackComment).subscribe({
       next: (response) => {
         this.setOpenToast(true, 'Feedback submitted successfully!');
-        this.feedbackRating = 0; // Reset
-        this.feedbackComment = ''; // Reset
+        this.feedbackRating = 0;
+        this.feedbackComment = '';
       },
       error: (err) => {
         console.error('Failed to submit feedback:', err);
@@ -340,13 +329,11 @@ export class tabAiPage implements OnInit, OnDestroy {
 
   getStarIcon(starNumber: number): string {
     if (this.feedbackRating >= starNumber) {
-      return 'star'; // Filled star
+      return 'star';
     }
-    // You could also add 'star-half' logic here if needed
-    return 'star-outline'; // Empty star
+    return 'star-outline';
   }
 
-  // Reset method for all AI recipe generation inputs
   resetAiRecipeInputs() {
     this.generatedRecipe = null;
     this.generateRecipeError = null;
@@ -366,6 +353,6 @@ export class tabAiPage implements OnInit, OnDestroy {
     this.feedbackComment = '';
     this.isSubmittingFeedback = false;
     this.isSavingRecipe = false;
-    this.loadCookers(); // Reload cookers just in case
+    this.loadCookers();
   }
 }

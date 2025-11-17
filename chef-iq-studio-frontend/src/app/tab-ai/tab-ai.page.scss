@@ -1,22 +1,22 @@
-/* tab-ai.page.scss - Enhanced Aesthetic */
+/* /Users/ralphgannaban/Documents/dev/chefiq-full/chef-iq-studio-frontend/src/app/tab-ai/tab-ai.page.scss */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 // --- Global & Base Styles ---
 ion-content {
-    --background: #f0f2f5; // Soft light grey background
+    --background: #f0f2f5;
     font-family: 'Poppins', sans-serif;
-    padding: 16px; // Consistent padding around the content
+    padding: 16px;
 }
 
 // --- Header Styling ---
 ion-header {
     ion-toolbar {
-        --background: #ffffff; // Clean white header
-        --color: #333333; // Dark text for good contrast
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // More pronounced but soft shadow
+        --background: #ffffff;
+        --color: #333333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         ion-title {
-            font-weight: 600; // Slightly bolder title
+            font-weight: 600;
             font-size: 1.35em;
         }
     }
@@ -24,127 +24,122 @@ ion-header {
 
 // --- Card Styling ---
 ion-card {
-    margin: 18px 0; // Increased vertical margin between cards
-    border-radius: 16px; // More rounded corners for a modern feel
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); // Deeper, softer shadow for a "floating" effect
-    background: #ffffff; // White card background
-    overflow: hidden; // Ensures content respects border-radius
-    border: 1px solid #e0e0e0; // Subtle border for definition
+    margin: 18px 0;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
 }
 
 ion-card-header {
-    padding: 24px 24px 12px; // Generous padding
-    background: #ffffff; // Consistent background
+    padding: 24px 24px 12px;
+    background: #ffffff;
 }
 
 ion-card-title {
-    font-size: 1.5em; // Larger, more impactful title
-    font-weight: 700; // Extra bold for emphasis
-    color: #4CAF50; // A vibrant green (primary brand color feel)
-    margin-bottom: 10px; // Space below title
-    letter-spacing: -0.02em; // Slight letter spacing adjustment
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #4CAF50;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
 }
 
 ion-card-subtitle {
     font-size: 0.95em;
-    color: #757575; // Medium grey for subtitle
+    color: #757575;
     margin-top: 0;
     line-height: 1.4;
 }
 
 ion-card-content {
-    padding: 16px 24px 24px; // Consistent padding
+    padding: 16px 24px 24px;
 }
 
 // --- List Items & Inputs within Cards ---
 ion-list {
-    background: transparent; // Blend with card background
+    background: transparent;
     padding-top: 0;
     padding-bottom: 0;
 }
 
 ion-item {
-    --background: #ffffff; // Item background
-    --border-color: #f0f0f0; // Very light border for separation
+    --background: #ffffff;
+    --border-color: #f0f0f0;
     --padding-start: 0;
     --inner-padding-end: 0;
-    margin-bottom: 10px; // Space between items in a list
-    border-radius: 10px; // Slightly rounded items
+    margin-bottom: 10px;
+    border-radius: 10px;
     transition: background-color 0.2s ease;
 
     &:last-child {
-        margin-bottom: 0; // No margin for the last item
+        margin-bottom: 0;
     }
 
     ion-label {
         color: #333333;
-        font-size: 1.05em; // Slightly larger label text
+        font-size: 1.05em;
         padding-top: 12px;
         padding-bottom: 12px;
         line-height: 1.5;
     }
 
-    // Input, Select, Textarea common styling
     ion-input, ion-select, ion-textarea {
-        --padding-start: 16px; // Internal padding
+        --padding-start: 16px;
         --padding-end: 16px;
         --padding-top: 14px;
         --padding-bottom: 14px;
-        --background: #f8f8f8; // Very light grey background for input fields
-        border-radius: 10px; // Rounded input fields
-        border: 1px solid #e0e0e0; // Subtle border
-        color: #333333; // Text color inside input
+        --background: #f8f8f8;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        color: #333333;
         font-size: 1em;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
-        // Placeholder styling
         &::placeholder {
             color: #b0b0b0;
             opacity: 1;
         }
     }
 
-    // Floating label adjustments
     ion-label[labelPlacement="floating"] {
-        color: #9e9e9e; // Placeholder color when floating
+        color: #9e9e9e;
         font-size: 0.9em;
-        transform: translate3d(16px, 14px, 0); // Align with input padding
+        transform: translate3d(16px, 14px, 0);
         &.label-floating {
-            transform: translate3d(16px, -10px, 0) scale(0.8); // Adjust for smaller size and position when floating
-            color: #4CAF50; // Highlight label when active
+            transform: translate3d(16px, -10px, 0) scale(0.8);
+            color: #4CAF50;
         }
     }
 
-    // Focus state for input/select/textarea
     &.item-has-focus {
         ion-input, ion-select, ion-textarea {
-            border-color: #4CAF50; // Highlight border on focus with primary green
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.25); // Subtle glow on focus
-            --background: #ffffff; // White background on focus
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.25);
+            --background: #ffffff;
         }
     }
 
-    // Specific styling for the remove button in ingredient list
     ion-button[color="danger"] {
-        height: 40px; // Consistent button height
+        height: 40px;
         font-size: 0.9em;
         border-radius: 8px;
-        margin-right: -10px; // Pull slightly to the edge
+        margin-right: -10px;
     }
 }
 
 // --- Ingredient Input Grid Layout ---
 ion-grid {
-    padding: 0; // Remove default grid padding
+    padding: 0;
     ion-row {
-        align-items: flex-end; // Align inputs nicely at the bottom
-        margin-bottom: 12px; // Space between rows of inputs
+        align-items: flex-end;
+        margin-bottom: 12px;
         ion-col {
-            padding: 6px; // Increased padding for columns
+            padding: 6px;
             ion-item {
               --padding-start: 0;
               --inner-padding-end: 0;
-              margin-bottom: 0; // Remove item's bottom margin in grid context
+              margin-bottom: 0;
             }
         }
     }
@@ -152,50 +147,46 @@ ion-grid {
 
 // --- Buttons ---
 ion-button {
-    text-transform: none; // Keep text as-is (e.g., "Add Ingredient")
+    text-transform: none;
     font-weight: 500;
-    height: 54px; // Taller, more prominent buttons
+    height: 54px;
     font-size: 1.1em;
-    border-radius: 12px; // More rounded buttons
-    transition: all 0.2s ease-in-out; // Smooth transitions
+    border-radius: 12px;
+    transition: all 0.2s ease-in-out;
 
-    // Primary action buttons (Generate Recipe, Add Ingredient)
     &[expand="block"] {
         margin-top: 20px;
-        --background: #4CAF50; // Vibrant green
+        --background: #4CAF50;
         --color: #ffffff;
-        --background-activated: #43A047; // Slightly darker on press
-        box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3); // Soft shadow
+        --background-activated: #43A047;
+        box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
     }
 
-    // Secondary action buttons (e.g., Save Recipe)
     &[color="primary"] {
-        --background: #2196F3; // A strong blue
+        --background: #2196F3;
         --color: #ffffff;
         --background-activated: #1976D2;
         box-shadow: 0 6px 15px rgba(33, 150, 243, 0.3);
     }
 
-    // Danger buttons (e.g., Remove Ingredient)
     &[color="danger"] {
-        --background: #EF5350; // Soft red
+        --background: #EF5350;
         --color: #ffffff;
         --background-activated: #E53935;
         box-shadow: 0 2px 8px rgba(239, 83, 80, 0.2);
     }
 
-    // Outline buttons (e.g., Show Shopping List)
     &[fill="outline"] {
-        --border-color: #2196F3; // Blue border
-        --color: #2196F3; // Blue text
+        --border-color: #2196F3;
+        --color: #2196F3;
         --background: transparent;
-        --background-hover: rgba(33, 150, 243, 0.08); // Subtle hover effect
+        --background-hover: rgba(33, 150, 243, 0.08);
         box-shadow: none;
-        height: 50px; // Slightly smaller than solid for aesthetic balance
+        height: 50px;
     }
 
     ion-spinner {
-        margin-right: 10px; // More space for spinner
+        margin-right: 10px;
     }
 
     &:disabled {
@@ -211,38 +202,38 @@ ion-radio-group {
 }
 
 ion-radio {
-    --color-checked: #2196F3; // Blue for checked radio
-    margin-right: 15px; // More space
-    --border-radius: 50%; // Ensure perfect circle
+    --color-checked: #2196F3;
+    margin-right: 15px;
+    --border-radius: 50%;
 }
 
 // --- Item Dividers ---
 ion-item-divider {
-    margin-top: 30px; // More space above
-    margin-bottom: 20px; // More space below
-    --background: #E8F5E9; // Light green tint for dividers
-    min-height: 50px; // Taller dividers
-    border-radius: 10px; // Rounded dividers
+    margin-top: 30px;
+    margin-bottom: 20px;
+    --background: #E8F5E9;
+    min-height: 50px;
+    border-radius: 10px;
     ion-label {
-        font-weight: 600; // Bolder label
-        color: #388E3C; // Darker green text
+        font-weight: 600;
+        color: #388E3C;
         padding-left: 15px;
-        font-size: 1.15em; // Slightly larger divider text
+        font-size: 1.15em;
     }
 }
 
 // --- Text Styling for Messages ---
 ion-text[color="danger"] {
-    color: #EF5350 !important; // Consistent soft red
+    color: #EF5350 !important;
     font-size: 0.95em;
     padding-inline-start: 24px;
     padding-inline-end: 24px;
-    display: block; // Ensures it takes full width and respects padding
+    display: block;
     margin-top: 10px;
     line-height: 1.4;
 }
 ion-text[color="medium"] {
-    color: #9E9E9E !important; // Light grey for medium text
+    color: #9E9E9E !important;
     font-size: 0.95em;
     padding-inline-start: 24px;
     padding-inline-end: 24px;
@@ -254,26 +245,26 @@ ion-text[color="medium"] {
 .rating-stars {
     display: flex;
     justify-content: center;
-    gap: 10px; // Increased gap between stars
-    padding: 25px 0; // More vertical padding
+    gap: 10px;
+    padding: 25px 0;
 
     ion-icon {
         cursor: pointer;
         transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-        font-size: 2.8em; // Significantly larger stars
+        font-size: 2.8em;
 
-        &[name="star"] { // Filled star
-            color: #FFC107; // Bright amber for filled stars
+        &[name="star"] {
+            color: #FFC107;
         }
-        &[name="star-outline"] { // Empty star
-            color: #C0C0C0; // Slightly darker grey for empty stars
+        &[name="star-outline"] {
+            color: #C0C0C0;
         }
         &[name="star-half-outline"] {
             color: #FFD740;
         }
 
         &:active {
-            transform: scale(1.2); // More prominent active state
+            transform: scale(1.2);
         }
     }
 }
@@ -281,7 +272,7 @@ ion-text[color="medium"] {
 // --- Generated Recipe Display Specifics ---
 ion-card-content {
     h2 {
-        color: #333333; // Darker text for key recipe info
+        color: #333333;
         font-size: 1.25em;
         margin-top: 12px;
         margin-bottom: 6px;
@@ -289,61 +280,60 @@ ion-card-content {
         line-height: 1.4;
     }
     p {
-        color: #555555; // Slightly lighter text for general details
+        color: #555555;
         margin-bottom: 5px;
         font-size: 0.98em;
-        line-height: 1.6; // Improved readability for paragraphs
+        line-height: 1.6;
         strong {
-            color: #333333; // Bolder text for key details
+            color: #333333;
             font-weight: 500;
         }
     }
 
-    // Adjustments for ion-label within generated recipe details
     ion-label.ion-text-wrap {
         h2, p {
-            margin: 0; // Reset default margins from h2, p inside ion-label
+            margin: 0;
             padding: 0;
-            line-height: 1.5; // Better readability
+            line-height: 1.5;
         }
         h2 {
             margin-bottom: 10px;
             margin-top: 12px;
         }
         p:last-child {
-            margin-bottom: 12px; // Ensure some space after the last paragraph
+            margin-bottom: 12px;
         }
     }
 }
 
 // --- Post-Recipe Actions Grid ---
 ion-grid.ion-margin-top.ion-padding-horizontal {
-    margin-top: 30px !important; // More space before action buttons
+    margin-top: 30px !important;
     padding-inline-start: 24px !important;
     padding-inline-end: 24px !important;
     ion-row {
-        justify-content: center; // Center buttons horizontally
+        justify-content: center;
         align-items: center;
-        margin-bottom: 15px; // Space between rows of buttons
+        margin-bottom: 15px;
         ion-col {
-            padding: 10px; // Padding for columns in this section
-            display: flex; // Use flexbox for button alignment
-            justify-content: center; // Center individual buttons within their column
+            padding: 10px;
+            display: flex;
+            justify-content: center;
         }
     }
 }
 
 .action-button {
-    min-width: 160px; // Ensure buttons have a minimum width
+    min-width: 160px;
 }
 
 // --- Shopping List Card ---
 .shopping-list-card {
-    border: 1px dashed #BDBDBD; // Dashed border for shopping list to differentiate
-    box-shadow: none; // No shadow for this card, makes it feel like an add-on
-    background: #FAFAFA; // Slightly different background
+    border: 1px dashed #BDBDBD;
+    box-shadow: none;
+    background: #FAFAFA;
     ion-card-title {
-        color: #2196F3; // Blue for shopping list title
+        color: #2196F3;
         font-size: 1.2em;
         font-weight: 600;
     }
@@ -355,31 +345,31 @@ ion-grid.ion-margin-top.ion-padding-horizontal {
 
 // --- Feedback Card ---
 .feedback-card {
-    border: 1px solid #CFD8DC; // Subtle border
-    background: #ECEFF1; // Light grey background
+    border: 1px solid #CFD8DC;
+    background: #ECEFF1;
     ion-card-title {
-        color: #607D8B; // Grey-blue for feedback title
+        color: #607D8B;
     }
 }
 
 // --- Floating Action Button ---
 ion-fab {
     ion-fab-button {
-        --background: #FFC107; // Amber for FAB
+        --background: #FFC107;
         --background-activated: #FFB300;
-        box-shadow: 0 8px 16px rgba(255, 193, 7, 0.4); // Prominent shadow
-        width: 60px; // Larger FAB
+        box-shadow: 0 8px 16px rgba(255, 193, 7, 0.4);
+        width: 60px;
         height: 60px;
         ion-icon {
-            font-size: 2em; // Larger icon
-            color: #ffffff; // White icon
+            font-size: 2em;
+            color: #ffffff;
         }
     }
 }
 
 // --- Toast Messages ---
 ion-toast {
-    --background: rgba(52, 73, 94, 0.95); // Dark, slightly desaturated blue-grey
+    --background: rgba(52, 73, 94, 0.95);
     --color: #ffffff;
     --border-radius: 10px;
     font-size: 1em;
@@ -387,18 +377,18 @@ ion-toast {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-// --- Cooker Selection Grid Styles (NEW from previous update) ---
+// --- Cooker Selection Grid Styles ---
 .cooker-selection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); // Responsive grid
-    gap: 16px; // Space between cooker items
-    padding: 10px 0; // Padding around the grid
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 10px 0;
 }
 
 .cooker-item {
-    background: #fdfdfd; // Slightly off-white for the item itself
-    border: 2px solid #e0e0e0; // Default light border
-    border-radius: 12px; // Rounded corners
+    background: #fdfdfd;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
     padding: 12px;
     display: flex;
     flex-direction: column;
@@ -407,25 +397,25 @@ ion-toast {
     text-align: center;
     cursor: pointer;
     transition: all 0.25s ease-in-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); // Subtle default shadow
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
     &:hover {
-        transform: translateY(-3px); // Slight lift on hover
+        transform: translateY(-3px);
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
 
     &.selected {
-        border-color: #4CAF50; // Green border when selected
-        background: #E8F5E9; // Light green background when selected
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.25); // More prominent shadow
-        transform: translateY(-2px) scale(1.02); // Slightly bigger when selected
+        border-color: #4CAF50;
+        background: #E8F5E9;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.25);
+        transform: translateY(-2px) scale(1.02);
     }
 
     .cooker-image {
-        width: 100px; // Fixed width for images
-        height: 100px; // Fixed height to keep aspect ratio and consistency
-        object-fit: contain; // Ensure image fits without cropping
-        margin-bottom: 8px; // Space between image and name
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 8px;
     }
 
     .cooker-name {
@@ -436,7 +426,53 @@ ion-toast {
     }
 }
 
-// --- General Utility Overrides (for consistency) ---
+// --- Cooking Intent Selection Grid Styles ---
+.intent-selection-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 10px 0;
+}
+
+.intent-item {
+    background: #fdfdfd;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+        border-color: #2196F3;
+        background: #E3F2FD;
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.2);
+    }
+
+    .intent-title {
+        font-weight: 600;
+        color: #333333;
+        font-size: 1.1em;
+        margin-bottom: 6px;
+    }
+
+    .intent-description {
+        font-size: 0.9em;
+        color: #757575;
+        line-height: 1.4;
+    }
+}
+
+// --- General Utility Overrides ---
 .ion-padding-horizontal {
     padding-inline-start: 24px !important;
     padding-inline-end: 24px !important;
